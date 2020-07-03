@@ -13,21 +13,21 @@ class PolypaintToGuidelinesTool(object):
     def showWindow(self):
         myWindow = mc.window('PolypaintToGuidelines', width=300, height=100)
         mc.columnLayout()
-        mc.button(label='Polypaint to curves', width=300, command=self.strokesToCurves)
+        mc.button(label='Polypaint to curves', width=300, height=20, command=self.strokesToCurves)
         mc.separator()
-        mc.button(label='Select Curves', width=300, command=self.selectCurves)
+        mc.button(label='Group Curves', width=300, height=20, command=self.grouping)
         mc.separator()
-        mc.button(label='Clean up', width=300, command=self.cleanUp)
+        mc.button(label='Clean up', width=300, height=20, command=self.cleanUp)
         mc.separator()
-        mc.button(label='Activate live selection', width=300)
+        mc.text(label='Select the sculp', align='center')
+        mc.button(label='Activate live selection', width=300, height=20, command=self.activateLiveSelection)
         mc.showWindow('PolypaintToGuidelines')
 
     def selectCurves(self, *args, **kwargs):
         curves1 = mc.ls('curve?')
         curves2 = mc.ls('curve??')
         curves = curves1 + curves2
-        mc.group(curves)
-        #return curves
+        return curves
 
     def strokesToCurves(self, *args, **kwargs):
         strokes1 = mc.ls('strokeDefaultBrush?')
@@ -37,8 +37,8 @@ class PolypaintToGuidelinesTool(object):
         mel.eval('PaintEffectsToCurve')
 
     def grouping(self, *args, **kwargs):
-        curves = selectCurves()
-        mc.group(curves)
+        curves = self.selectCurves()
+        mc.group(curves, name='curveSet#')
 
     def cleanUp(self, *args, **kwargs):
 
@@ -52,6 +52,8 @@ class PolypaintToGuidelinesTool(object):
         for element in trash:
             mc.delete(element)
 
-    def polyPaintToCurves(self, *args, **kwargs):
-        grouping()
-        cleanUp()
+    def activateLiveSelection(self, *args, **kwargs):
+        mel.eval('statusLineSetMakeLive')
+        curves = self.selectCurves()
+        mc.select(curves)
+        mel.eval('SelectCurveCVsFirst')
